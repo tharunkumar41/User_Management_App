@@ -1,0 +1,30 @@
+
+/* progress for async vision jobs */
+.progress-bar {
+  height: 8px;
+  background: var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: .25rem;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--teal);
+  border-radius: 4px;
+  transition: width .35s ease;
+}
+
+/* Mock test */
+.mock-options { display: flex; flex-direction: column; gap: .4rem; margin-top: .75rem; }
+.mock-opt {
+  display: flex; align-items: flex-start; gap: .5rem;
+  padding: .5rem .65rem; border: 1px solid var(--line); border-radius: var(--radius);
+  cursor: pointer; background: var(--paper);
+}
+.mock-opt.selected { border-color: var(--teal); background: #e6f7f5; }
+.mock-opt input { margin-top: .2rem; }
+.btn-sm { padding: .35rem .7rem; font-size: .85rem; }
+.btn-outline {
+  background: transparent; border: 1px solid var(--line); color: var(--ink);
+}
+.btn-outline:hover { border-color: var(--teal); color: var(--teal); }

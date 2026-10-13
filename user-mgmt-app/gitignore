@@ -1,0 +1,345 @@
+# Mess Mate - Git Ignore File
+
+# ============================================
+# Node.js / NPM
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Package manager lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ============================================
+# Build outputs
+# ============================================
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.vite/
+
+# ============================================
+# Environment variables
+# ============================================
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+.env.staging.local
+.env.*
+!.env.example
+
+# ============================================
+# IDE / Editor files
+# ============================================
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================
+# Operating System files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# Logs
+# ============================================
+*/api/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+*.lcov
+.nyc_output/
+.jest/
+.coverage/
+test-results/
+playwright-report/
+.playwright/
+testing/
+
+# ============================================
+# Temporary files
+# ============================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# ============================================
+# Database files
+# ============================================
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Prisma migration temporary files
+migration_temp.sql
+**/migration_temp.sql
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+docker-compose.override.yml
+
+# ============================================
+# Cloud / Deployment
+# ============================================
+.vercel
+.netlify
+.firebase/
+.serverless/
+.fusebox/
+
+# ============================================
+# Dependencies
+# ============================================
+jspm_packages/
+bower_components/
+web_modules/
+
+# ============================================
+# TypeScript
+# ============================================
+*.tsbuildinfo
+.tsbuildinfo
+
+# ============================================
+# React / Next.js specific
+# ============================================
+.next/
+out/
+.swc/
+
+# ============================================
+# Vite specific
+# ============================================
+dist-ssr/
+*.local
+
+# ============================================
+# Mobile development
+# ============================================
+# React Native
+.expo/
+.expo-shared/
+
+# Android
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+local.properties
+.gradle/
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+google-services.json
+
+# iOS
+*.ipa
+*.dSYM.zip
+*.dSYM
+DerivedData/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+Pods/
+ios/Pods/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.kotlin
+.packages
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Flutter generated plugin registrants (auto-generated)
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/windows/flutter/generated_plugins.cmake
+**/windows/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugins.cmake
+**/linux/flutter/generated_plugin_registrant.cc
+
+# Flutter package analysis reports (temporary)
+**/outdated-*.json
+**/outdated.json
+
+# ============================================
+# Backend specific
+# ============================================
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+# Python virtual environments (but not Flutter app env/ directories)
+/env/
+/venv/
+/ENV/
+/env.bak/
+/venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================
+# Security & Sensitive files
+# ============================================
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+.secrets/
+.credentials/
+
+# Firebase service account credentials
+firebase-adminsdk*.json
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+
+# ============================================
+# CI/CD
+# ============================================
+.github/workflows/*.log
+
+# ============================================
+# Documentation build
+# ============================================
+docs/_build/
+docs/.doctrees/
+site/
+
+# ============================================
+# Miscellaneous
+# ============================================
+.sass-cache/
+*.css.map
+*.js.map
+.eslintcache
+.stylelintcache
+.parcel-cache/
+
+# ============================================
+# Project specific
+# ============================================
+# Ignore uploaded files in development
+uploads/
+public/uploads/
+
+# Ignore generated API documentation
+api-docs/generated/
+docs/04-api/references/
+docs/07-development/references/
+
+# Ignore local configuration
+config/local.json
+config/local.js
+
+# Ignore backup files
+backups/
+*.backup
+
+# Ignore analytics and tracking data
+/analytics/
+/tracking/

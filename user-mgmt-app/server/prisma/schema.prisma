@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+}
+
+enum OtpPurpose {
+  CHANGE_PASSWORD
+  VERIFY_EMAIL
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  passwordHash   String?
+  googleId       String?  @unique
+  phone          String?
+  isVerified     Boolean  @default(false)
+  profilePicture String?
+  role           Role     @default(USER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  otps        Otp[]
+  resetTokens PasswordResetToken[]
+
+  conversations ConversationMember[]
+  messages      Message[]
+  deviceTokens  DeviceToken[]
+  notifications Notification[]
+
+  questionSources QuestionSource[]
+  mockPapers      MockPaper[]
+  mockAttempts    MockAttempt[]
+}
+
+model Otp {
+  id        String     @id @default(uuid())
+  userId    String
+  codeHash  String
+  purpose   OtpPurpose
+  attempts  Int        @default(0)
+  verified  Boolean    @default(false)
+  used      Boolean    @default(false)
+  expiresAt DateTime
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------- Chat ----------
+
+model Conversation {
+  id        String   @id @default(uuid())
+  directKey String   @unique // sorted "idA:idB": exactly one 1-to-1 chat per pair of users
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // bumped on every message; sorts the inbox
+
+  members  ConversationMember[]
+  messages Message[]
+}
+
+model ConversationMember {
+  conversationId String
+  userId         String
+  lastReadAt     DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  conversationId String
+  senderId       String
+  type           MessageType @default(TEXT)
+  content        String?
+  mediaUrl       String?
+  mediaMime      String?
+  createdAt      DateTime    @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+// ---------- Notifications ----------
+
+model DeviceToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String // e.g. "chat_message"
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+
+// ---------- Mock Tests (Features List 4) ----------
+
+enum SourceType {
+  PYQ          // previous years question paper
+  TEXTBOOK     // textbook chapter
+  ANSWER_KEY   // answer key PDF paired with a PYQ
+}
+
+enum MockPaperType {
+  PYQ
+  TEXTBOOK
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  EVALUATED
+}
+
+model QuestionSource {
+  id          String     @id @default(uuid())
+  title       String
+  type        SourceType
+  year        Int?       // for PYQ e.g. 2023
+  chapter     String?    // for textbook
+  weightage   Float      @default(1) // relative weight when generating textbook papers
+  fileName    String?
+  fileUrl     String?
+  rawText     String?    @db.Text
+  uploadedBy  String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  uploader  User       @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  questions Question[]
+  // optional link: answer key source points to its question paper
+  linkedSourceId String?
+  linkedSource   QuestionSource?  @relation("SourceLink", fields: [linkedSourceId], references: [id])
+  linkedKeys     QuestionSource[] @relation("SourceLink")
+
+  @@index([type])
+  @@index([uploadedBy])
+}
+
+model Question {
+  id             String   @id @default(uuid())
+  sourceId       String
+  questionNumber Int?
+  text           String   @db.Text
+  optionA        String
+  optionB        String
+  optionC        String?
+  optionD        String?
+  optionE        String?
+  correctAnswer  String?  // "A" | "B" | "C" | "D" | "E"
+  explanation    String?  @db.Text
+  marks          Float    @default(1)
+  chapter        String?  // denormalized from source for filtering
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  source          QuestionSource      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  paperQuestions  MockPaperQuestion[]
+  attemptAnswers  MockAttemptAnswer[]
+
+  @@index([sourceId])
+  @@index([chapter])
+}
+
+model MockPaper {
+  id            String        @id @default(uuid())
+  title         String
+  type          MockPaperType
+  totalQuestions Int
+  durationMin   Int           @default(60)
+  totalMarks    Float         @default(0)
+  config        Json?         // e.g. chapter weightages used
+  createdBy     String
+  createdAt     DateTime      @default(now())
+
+  creator   User               @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  questions MockPaperQuestion[]
+  attempts  MockAttempt[]
+
+  @@index([createdBy])
+  @@index([type])
+}
+
+model MockPaperQuestion {
+  id         String @id @default(uuid())
+  paperId    String
+  questionId String
+  orderIndex Int
+
+  paper    MockPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  question Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([paperId, questionId])
+  @@index([paperId])
+}
+
+model MockAttempt {
+  id          String        @id @default(uuid())
+  paperId     String
+  userId      String
+  status      AttemptStatus @default(IN_PROGRESS)
+  score       Float?
+  maxScore    Float?
+  startedAt   DateTime      @default(now())
+  submittedAt DateTime?
+
+  paper   MockPaper           @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers MockAttemptAnswer[]
+
+  @@index([userId])
+  @@index([paperId])
+}
+
+model MockAttemptAnswer {
+  id           String  @id @default(uuid())
+  attemptId    String
+  questionId   String
+  selected     String? // "A".."E"
+  isCorrect    Boolean?
+  marksAwarded Float?
+
+  attempt  MockAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+}
